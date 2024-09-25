@@ -46,7 +46,7 @@ exports.getSubCategories = asyncHandler(async (req, res) => {
 
   const countDocs = await SubCategoryModel.countDocuments();
 
-  const apiFeatures = new ApiFeatures(SubCategoryModel.find(), req.query)
+  const apiFeatures = new ApiFeatures(SubCategoryModel.find(), req.filterObj)
     .paginate(countDocs)
     .filter()
     .search()
