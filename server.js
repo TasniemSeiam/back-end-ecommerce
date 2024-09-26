@@ -6,6 +6,7 @@ const dbConnection = require("./config/database");
 const categoryRoute = require("./routes/category.route");
 const subCategoryRoute = require("./routes/subCategory.route");
 const productsRoute = require("./routes/products.route");
+const brandRoute = require("./routes/brand.route");
 const ApiError = require("./util/apiError");
 const globalErrorHandler = require("./middleware/error.middleware");
 
@@ -27,6 +28,7 @@ if (process.env.NODE_ENV === "development") {
 // Mount Routes
 app.use("/api/v1/categories", categoryRoute);
 app.use("/api/v1/subcategories", subCategoryRoute);
+app.use("/api/v1/brands", brandRoute);
 app.use("/api/v1/products", productsRoute);
 
 

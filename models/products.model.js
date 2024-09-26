@@ -37,7 +37,7 @@ const productSchema = new Schema(
 
     colors: [String],
     size: [String],
-    material:[String],
+    material: [String],
 
     imageCover: {
       type: String,
@@ -81,10 +81,18 @@ const productSchema = new Schema(
       type: Number,
       default: 0,
     },
-    reviews: [{ type: Schema.Types.ObjectId, ref: 'Review' }],
+    reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }],
   },
   { timestamps: true }
 );
+
+productSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "category",
+    select: "name",
+  });
+  next();
+});
 
 const ProductModel = mongoose.model("Product", productSchema);
 
