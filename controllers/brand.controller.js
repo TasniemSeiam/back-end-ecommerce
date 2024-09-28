@@ -1,5 +1,19 @@
 const BrandModel = require("../models/brand.model");
 const factory = require("../controllers/handlersFactory.controller");
+const ApiError = require("../util/apiError");
+const uploadMiddleware = require("../middleware/upload.middleware");
+
+const upload = uploadMiddleware("brand-image");
+const uploadImage = upload.single("image");
+
+const handelUpload = (req, res, next) => {
+  if (!req.file) {
+    return next(new ApiError("No image uploaded", 400));
+  }
+  const fileUrl = req.file.path;
+  req.body.image = fileUrl;
+  next();
+};
 
 const createNewBrand = factory.createOne(BrandModel);
 
@@ -16,4 +30,6 @@ module.exports = {
   getBrandById,
   updateBrand,
   deleteBrand,
+  uploadImage,
+  handelUpload,
 };

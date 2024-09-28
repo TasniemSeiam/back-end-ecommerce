@@ -1,8 +1,11 @@
+// const dotenv = require("dotenv");
+require('dotenv').config();
+
 const express = require("express");
-const dotenv = require("dotenv");
 const morgan = require("morgan");
 const cors = require("cors");
 const dbConnection = require("./config/database");
+
 const categoryRoute = require("./routes/category.route");
 const subCategoryRoute = require("./routes/subCategory.route");
 const productsRoute = require("./routes/products.route");
@@ -10,7 +13,7 @@ const brandRoute = require("./routes/brand.route");
 const ApiError = require("./util/apiError");
 const globalErrorHandler = require("./middleware/error.middleware");
 
-dotenv.config();
+// dotenv.config();
 
 // Connect DB
 dbConnection();

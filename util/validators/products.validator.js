@@ -3,6 +3,7 @@ const validationMiddleware = require("../../middleware/validator.middleware");
 const CategoryModel = require("../../models/category.model");
 const SubCategoryModel = require("../../models/subCategory.model");
 const { default: slugify } = require("slugify");
+const BrandModel = require("../../models/brand.model");
 
 exports.getProductValidator = [
   check("id")
@@ -80,6 +81,15 @@ exports.createProductValidator = [
     .optional()
     .isMongoId()
     .withMessage("Invalid ID formate")
+    .customSanitizer((val) => {
+      // Ensure that subcategories is an array, even if a single value is passed
+      if (!Array.isArray(val)) {
+        return [val];
+      }
+      return val;
+    })
+    .isArray()
+    .withMessage("Subcategories must be an array of valid IDs")
     .custom((subcategoriesIds) =>
       SubCategoryModel.find({
         _id: { $exists: true, $in: subcategoriesIds },
@@ -92,12 +102,11 @@ exports.createProductValidator = [
     .custom((val, { req }) =>
       SubCategoryModel.find({ category: req.body.category }).then(
         (subcategories) => {
-          const subCategoriesIdsInDB = [];
-          subcategories.forEach((subCategory) => {
-            subCategoriesIdsInDB.push(subCategory._id.toString());
-          });
-          // subcategories ids in db include subcategories in req.body
+          const subCategoriesIdsInDB = subcategories.map((subCat) =>
+            subCat._id.toString()
+          );
           const checker = (target, arr) => target.every((v) => arr.includes(v));
+
           if (!checker(val, subCategoriesIdsInDB)) {
             return Promise.reject(
               new Error(`subcategories not belong to category`)
@@ -105,6 +114,18 @@ exports.createProductValidator = [
           }
         }
       )
+    ),
+
+  check("brand")
+    .optional()
+    .isMongoId()
+    .withMessage("Invalid ID formate")
+    .custom((brandId) =>
+      BrandModel.findById(brandId).then((brand) => {
+        if (!brand) {
+          return Promise.reject(new Error(`No brand for this id: ${brandId}`));
+        }
+      })
     ),
 
   check("ratingsAverage")

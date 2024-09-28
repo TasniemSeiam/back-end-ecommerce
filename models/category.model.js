@@ -12,9 +12,9 @@ const categorySchema = new Schema(
       maxlength: [40, "category should be at most 40 characters"],
     },
     slug: { type: String, lowercase: true },
-    // image: {
-    //   type: String,
-    // },
+    image: {
+      type: String,
+    },
     // user: { type: Schema.Types.ObjectId, ref: 'User' },
   },
   { timestamps: true }
