@@ -47,8 +47,8 @@ exports.getAll = (Model) =>
     if (req.filterObj) {
       filter = req.filterObj;
     }
-    //build query
 
+    //build query
     const countDocs = await Model.countDocuments();
 
     const apiFeatures = new ApiFeatures(Model.find(filter), req.query)

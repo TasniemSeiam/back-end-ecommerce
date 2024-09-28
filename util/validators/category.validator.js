@@ -16,6 +16,7 @@ exports.createCategoryValidator = [
       req.body.slug = slugify(val);
       return true;
     }),
+  
   validationMiddleware,
 ];
 

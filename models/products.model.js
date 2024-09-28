@@ -89,7 +89,15 @@ const productSchema = new Schema(
 productSchema.pre(/^find/, function (next) {
   this.populate({
     path: "category",
-    select: "name",
+    select: "name -_id",
+  });
+  // this.populate({
+  //   path: "subcategories",
+  //   select: "name -_id",
+  // });
+  this.populate({
+    path: "brand",
+    select: "name -_id",
   });
   next();
 });

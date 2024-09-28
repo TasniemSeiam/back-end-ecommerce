@@ -12,18 +12,22 @@ const {
   updateProductValidator,
   deleteProductValidator,
 } = require("../util/validators/products.validator");
+const {
+  handelUpload,
+  uploadImage,
+} = require("../controllers/products.controller");
 
 const router = express.Router();
 
 router
   .route("/")
   .get(getAllProducts)
-  .post(createProductValidator, createNewProduct);
+  .post(uploadImage, handelUpload, createProductValidator, createNewProduct);
 
 router
   .route("/:id")
   .get(getProductValidator, getProductById)
-  .put(updateProductValidator, updateProduct)
+  .put(uploadImage, handelUpload, updateProductValidator, updateProduct)
   .delete(deleteProductValidator, deleteProduct);
 
 module.exports = router;

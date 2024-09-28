@@ -12,15 +12,22 @@ const {
   updateBrandValidator,
   deleteBrandValidator,
 } = require("../util/validators/brand.validator");
+const {
+  handelUpload,
+  uploadImage,
+} = require("../controllers/category.controller");
 
 const router = express.Router();
 
-router.route("/").get(getAllBrands).post(createBrandValidator, createNewBrand);
+router
+  .route("/")
+  .get(getAllBrands)
+  .post(uploadImage, handelUpload, createBrandValidator, createNewBrand);
 
 router
   .route("/:id")
   .get(getBrandValidator, getBrandById)
-  .put(updateBrandValidator, updateBrand)
+  .put(uploadImage, handelUpload, updateBrandValidator, updateBrand)
   .delete(deleteBrandValidator, deleteBrand);
 
 module.exports = router;
