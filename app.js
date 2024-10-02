@@ -1,6 +1,6 @@
 const express = require("express");
 const path = require("path");
-const cookieParser =require("cookie-parser");
+const cookieParser = require("cookie-parser");
 const HandleError = require("./util/AppHandleError");
 const globalErrorHandler = require("./middleware/error.middleware");
 const morgan = require("morgan");
@@ -25,8 +25,7 @@ const orderRoute = require("./routes/Order.route");
 const { webhookCheckout } = require("./controllers/Order.controller");
 
 app.use(cors());
-app.options('*', cors());
-
+app.options("*", cors());
 
 // Set security HTTP headers
 app.use(helmet());
@@ -47,19 +46,19 @@ app.use(
       "stock",
       "ratingsAverage",
       "ratingsQuantity",
-      "discount"
+      "discount",
     ],
   })
 );
 
 // Checkout webhook
 app.post(
-  '/webhook-checkout',
-  express.raw({ type: 'application/json' }),
+  "/webhook-checkout",
+  express.raw({ type: "application/json" }),
   webhookCheckout
 );
 
-app.use(express.static(path.join(__dirname, 'uploads')));
+app.use(express.static(path.join(__dirname, "uploads")));
 // Middleware to parse JSON bodies
 app.use(express.json());
 app.use(cookieParser());
@@ -91,15 +90,15 @@ app.use("/", Limiter);
 //     next();
 // })
 
-app.use('/api/v1/auth', authRoute);
-app.use('/api/v1/users', userRoute);
+app.use("/api/v1/auth", authRoute);
+app.use("/api/v1/users", userRoute);
 app.use("/api/v1/categories", categoryRoute);
 app.use("/api/v1/brands", brandRoute);
 app.use("/api/v1/subcategories", subCategoryRoute);
 app.use("/api/v1/products", productsRoute);
 app.use("/api/v1/coupons", couponRoute);
 app.use("/api/v1/cart", cartRoute);
-app.use('/api/v1/wishlist', wishlistRoute);
+app.use("/api/v1/wishlist", wishlistRoute);
 app.use("/api/v1/orders", orderRoute);
 
 // Handle all unhandled routes (404 Not Found)
@@ -115,3 +114,5 @@ app.all("*", (req, res, next) => {
 app.use(globalErrorHandler);
 
 module.exports = app;
+
+//trying
