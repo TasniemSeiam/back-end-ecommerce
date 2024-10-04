@@ -4,10 +4,7 @@ const CategoryModel = require("../../models/category.model");
 const SubCategoryModel = require("../../models/subCategory.model");
 const { default: slugify } = require("slugify");
 const BrandModel = require("../../models/brand.model");
-<<<<<<< HEAD
 const UserModel = require("../../models/User.model");
-=======
->>>>>>> origin/main
 
 exports.getProductValidator = [
   check("id")
@@ -80,7 +77,6 @@ exports.createProductValidator = [
         }
       })
     ),
-<<<<<<< HEAD
   check("sellerId")
     .notEmpty()
     .withMessage("Product must be belong to a specific seller")
@@ -95,8 +91,6 @@ exports.createProductValidator = [
         }
       })
     ),
-=======
->>>>>>> origin/main
 
   check("subcategories")
     .optional()

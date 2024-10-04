@@ -2,11 +2,7 @@ const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../config/cloudinary");
 const path = require("path");
-<<<<<<< HEAD
 const ApiError = require("../util/AppHandleError");
-=======
-const ApiError = require("../util/apiError");
->>>>>>> origin/main
 
 
 const multerFileFilter = (req, file, cb) => {
@@ -43,8 +39,4 @@ function uploadMiddleware(folderName) {
   });
 }
 
-<<<<<<< HEAD
 module.exports = uploadMiddleware;
-=======
-module.exports = uploadMiddleware;
->>>>>>> origin/main

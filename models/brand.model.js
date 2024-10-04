@@ -4,7 +4,6 @@ const { Schema } = mongoose;
 const brandSchema = new Schema(
   {
     name: {
-<<<<<<< HEAD
       type: String,
       required: [true, "Brand required"],
       unique: [true, "Brand must be unique"],
@@ -28,22 +27,6 @@ brandSchema.post("findOneAndDelete", async function (doc) {
     console.log(`Deleted all products related to brand: ${doc._id}`);
   }
 });
-=======
-        type: String,
-        required: [true, 'Brand required'],
-        unique: [true, 'Brand must be unique'],
-        minlength: [3, 'Too short Brand name'],
-        maxlength: [32, 'Too long Brand name'],
-      },
-      slug: {
-        type: String,
-        lowercase: true,
-      },
-      image: String,
-    },
-    { timestamps: true }
-  );
->>>>>>> origin/main
 
 const BrandModel = mongoose.model("Brand", brandSchema);
 

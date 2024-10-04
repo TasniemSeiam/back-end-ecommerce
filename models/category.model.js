@@ -1,9 +1,6 @@
 const mongoose = require("mongoose");
-<<<<<<< HEAD
 const ProductModel = require("./products.model");
 const SubCategoryModel = require("./subCategory.model");
-=======
->>>>>>> origin/main
 const { Schema } = mongoose;
 
 const categorySchema = new Schema(
@@ -19,18 +16,14 @@ const categorySchema = new Schema(
     slug: { type: String, lowercase: true },
     image: {
       type: String,
-<<<<<<< HEAD
       // default: "../assets/default-category-cover.jpg",
       required: [true, "image cover is required"],
-=======
->>>>>>> origin/main
     },
     // user: { type: Schema.Types.ObjectId, ref: 'User' },
   },
   { timestamps: true }
 );
 
-<<<<<<< HEAD
 // Middleware to remove products associated with the category after deleting it
 categorySchema.post("findOneAndDelete", async function (doc) {
   if (doc) {
@@ -45,8 +38,6 @@ categorySchema.post("findOneAndDelete", async function (doc) {
   }
 });
 
-=======
->>>>>>> origin/main
 const CategoryModel = mongoose.model("Category", categorySchema);
 
 module.exports = CategoryModel;
