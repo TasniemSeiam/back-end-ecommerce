@@ -16,7 +16,10 @@ exports.createCategoryValidator = [
       req.body.slug = slugify(val);
       return true;
     }),
+<<<<<<< HEAD
   check("image").notEmpty().withMessage("image cover is required"),
+=======
+>>>>>>> origin/main
   
   validationMiddleware,
 ];

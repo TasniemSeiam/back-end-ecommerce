@@ -75,6 +75,7 @@ class ApiFeatures {
     }
     return this;
   }
+<<<<<<< HEAD
   // populate() { 
   //   this.buildQuery= this.buildQuery.populate({ path: "category", select: "name" });
   //   return this;
@@ -82,3 +83,9 @@ class ApiFeatures {
 }
 
 module.exports = ApiFeatures;
+=======
+ 
+}
+
+module.exports = ApiFeatures;
+>>>>>>> origin/main

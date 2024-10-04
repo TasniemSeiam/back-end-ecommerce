@@ -8,4 +8,8 @@ const validationMiddleware = (req, res, next) => {
   next();
 };
 
+<<<<<<< HEAD
 module.exports = validationMiddleware;
+=======
+module.exports = validationMiddleware;
+>>>>>>> origin/main

@@ -1,9 +1,15 @@
 const BrandModel = require("../models/brand.model");
 const factory = require("../controllers/handlersFactory.controller");
+<<<<<<< HEAD
 const ApiError = require("../util/AppHandleError");
 const uploadMiddleware = require("../middleware/upload.middleware");
 
 // Upload single brand image 
+=======
+const ApiError = require("../util/apiError");
+const uploadMiddleware = require("../middleware/upload.middleware");
+
+>>>>>>> origin/main
 const upload = uploadMiddleware("brand-image");
 const uploadImage = upload.single("image");
 
@@ -16,6 +22,7 @@ const handelUpload = (req, res, next) => {
   next();
 };
 
+<<<<<<< HEAD
 // @desc    Create brand
 // @route   POST  /api/v1/brands
 // @access  Private
@@ -39,6 +46,15 @@ const updateBrand = factory.updateOne(BrandModel);
 // @desc    Delete specific brand
 // @route   DELETE /api/v1/brands/:id
 // @access  Private
+=======
+const createNewBrand = factory.createOne(BrandModel);
+
+const getAllBrands = factory.getAll(BrandModel);
+
+const getBrandById = factory.getOne(BrandModel);
+const updateBrand = factory.updateOne(BrandModel);
+
+>>>>>>> origin/main
 const deleteBrand = factory.deleteOne(BrandModel);
 
 module.exports = {
