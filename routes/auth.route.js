@@ -3,21 +3,28 @@ const {
   signupValidator,
   loginValidator,
 } = require('../util/validators/auth.validator');
+const validationMiddleware  = require('../middleware/validator.middleware');
 
 const {
   signup,
   login,
-  forgotPassword,
-  verifyPassResetCode,
-  resetPassword,
+  authWithGoogle,
+  signOut,
+  sendOtp,
+  verifyOTPAndResetPassword,
+  verifyOTPAndResetPasswordValidation,
 } = require('../controllers/Auth.controller');
+const { registerVaildation } = require('../util/validators/user.validator');
 
 const router = express.Router();
 
-router.post('/signup', signupValidator, signup);
+router.post('/signup', registerVaildation, signup);
 router.post('/login', loginValidator, login);
-router.post('/forgotPassword', forgotPassword);
-router.post('/verifyResetCode', verifyPassResetCode);
-router.put('/resetPassword', resetPassword);
+router.post('/auth/google',authWithGoogle);
+router.get('/sign-out',signOut);
+
+// router.post("/reset-password",verifyOTPAndResetPasswordValidation,verifyOTPAndResetPassword)
+// router.post("/send-otp",emailForResetValidation,sendOtp)
+
 
 module.exports = router;

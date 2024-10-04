@@ -28,8 +28,6 @@ exports.updateOne = (Model) =>
 exports.createOne = (Model) =>
   asyncHandler(async (req, res) => {
     const document = await Model.create(req.body);
-    console.log(req.body);
-    
     res.status(201).json({ message: "new document created", data: document });
   });
 
@@ -49,8 +47,8 @@ exports.getAll = (Model) =>
     if (req.filterObj) {
       filter = req.filterObj;
     }
-    //build query
 
+    //build query
     const countDocs = await Model.countDocuments();
 
     const apiFeatures = new ApiFeatures(Model.find(filter), req.query)
@@ -72,3 +70,4 @@ exports.getAll = (Model) =>
       data: { documents },
     });
   });
+

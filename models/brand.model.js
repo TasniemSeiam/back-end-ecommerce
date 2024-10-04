@@ -19,6 +19,15 @@ const brandSchema = new Schema(
   { timestamps: true }
 );
 
+// Middleware to delete products associated with the brand
+brandSchema.post("findOneAndDelete", async function (doc) {
+  if (doc) {
+    // Delete all products that belong to the deleted brand
+    await ProductModel.deleteMany({ brand: doc._id });
+    console.log(`Deleted all products related to brand: ${doc._id}`);
+  }
+});
+
 const BrandModel = mongoose.model("Brand", brandSchema);
 
 module.exports = BrandModel;

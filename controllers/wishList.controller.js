@@ -1,6 +1,6 @@
 const asyncHandler = require('express-async-handler');
 
-const User = require('../models/User.model');
+const UserModel = require('../models/User.model');
 
 
 // end point   POST /api/v1/wishlist
@@ -8,7 +8,7 @@ const User = require('../models/User.model');
 exports.addProductToWishlist = asyncHandler(async (req, res, next) => {
   // $addToSet => add productId to wishlist array if productId not exist
   
-  const user = await User.findByIdAndUpdate(
+  const user = await UserModel.findByIdAndUpdate(
     req.user._id,
     {
       $addToSet: { wishlist: req.body.productId },
@@ -28,7 +28,7 @@ exports.addProductToWishlist = asyncHandler(async (req, res, next) => {
 // allow to User
 exports.removeProductFromWishlist = asyncHandler(async (req, res, next) => {
   // $pull => remove productId from wishlist array if productId exist
-  const user = await User.findByIdAndUpdate(
+  const user = await UserModel.findByIdAndUpdate(
     req.user._id,
     {
       $pull: { wishlist: req.params.productId },
@@ -47,7 +47,7 @@ exports.removeProductFromWishlist = asyncHandler(async (req, res, next) => {
 // end point   GET /api/v1/wishlist
 // allow to User
 exports.getLoggedUserWishlist = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user._id).populate('wishlist');
+  const user = await UserModel.findById(req.user._id).populate('wishlist');
 
   res.status(200).json({
     status: 'success',

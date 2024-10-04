@@ -12,17 +12,24 @@ const {
   updateBrandValidator,
   deleteBrandValidator,
 } = require("../util/validators/brand.validator");
-
-const auth = require("../controllers/Auth.controller");
+const {
+  handelUpload,
+  uploadImage,
+  handelUpdateImage,
+} = require("../controllers/category.controller");
+const auth = require('../controllers/Auth.controller');
 
 const router = express.Router();
 
-router.route("/").get(getAllBrands).post(auth.protect,auth.allowedTo('admin', 'manager'),createBrandValidator, createNewBrand);
+router
+  .route("/")
+  .get(getAllBrands)
+  .post(auth.protect,auth.allowedTo('admin','seller'),uploadImage, handelUpload, createBrandValidator, createNewBrand);
 
 router
   .route("/:id")
   .get(getBrandValidator, getBrandById)
-  .put(auth.protect,auth.allowedTo('admin', 'manager'),updateBrandValidator, updateBrand)
-  .delete(auth.protect,auth.allowedTo('admin'),deleteBrandValidator, deleteBrand);
+  .put(auth.protect,auth.allowedTo('admin','seller'),uploadImage, handelUpdateImage, updateBrandValidator, updateBrand)
+  .delete(auth.protect,auth.allowedTo('admin','seller'),deleteBrandValidator, deleteBrand);
 
 module.exports = router;

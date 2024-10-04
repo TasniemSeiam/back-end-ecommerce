@@ -22,6 +22,7 @@ const couponRoute = require("./routes/Coupon.route");
 const wishlistRoute = require("./routes/wishList.route");
 const cartRoute = require("./routes/Cart.route");
 const orderRoute = require("./routes/Order.route");
+const reviewRoute = require("./routes/review.router");
 const { webhookCheckout } = require("./controllers/Order.controller");
 
 app.use(cors());
@@ -101,6 +102,7 @@ app.use("/api/v1/coupons", couponRoute);
 app.use("/api/v1/cart", cartRoute);
 app.use('/api/v1/wishlist', wishlistRoute);
 app.use("/api/v1/orders", orderRoute);
+app.use("/api/v1/reviews", reviewRoute);
 
 // Handle all unhandled routes (404 Not Found)
 app.all("*", (req, res, next) => {

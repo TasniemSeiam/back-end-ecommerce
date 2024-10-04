@@ -1,7 +1,7 @@
 const slugify = require('slugify');
 const { check } = require('express-validator');
 const validatorMiddleware = require('../../middleware/validator.middleware');
-const User = require('../../models/User.model');
+const UserModel = require('../../models/User.model');
 
 exports.signupValidator = [
   check('name')
@@ -20,7 +20,7 @@ exports.signupValidator = [
     .isEmail()
     .withMessage('Invalid email address')
     .custom((val) =>
-      User.findOne({ email: val }).then((user) => {
+      UserModel.findOne({ email: val }).then((user) => {
         if (user) {
           return Promise.reject(new Error('E-mail already in user'));
         }

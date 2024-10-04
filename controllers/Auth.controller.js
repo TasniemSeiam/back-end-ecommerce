@@ -1,50 +1,214 @@
-const crypto = require('crypto');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const generateOTP = require("../util/generateOTP.js");
+const generateToken = require("../util/generateToken.js");
+const asyncHandler = require("express-async-handler");
 
-const asyncHandler = require('express-async-handler');
+const ApiError = require("../util/AppHandleError");
+const sendEmail = require("../util/sendEmail");
 
-const ApiError = require('../util/AppHandleError');
-const sendEmail = require('../util/sendEmail');
-const createToken = require('../util/createToken');
+const UserModel = require("../models/User.model");
 
-const User = require('../models/User.model');
+const htmlForResetPAssword = (otpNumber, name) => {
+  return `   <main>
+        <div
+          style="
+            margin: 0;
+            margin-top: 70px;
+            padding: 92px 30px 115px;
+            background: #ffffff;
+            border-radius: 30px;
+            text-align: center;
+          "
+        >
+          <div style="width: 100%; max-width: 489px; margin: 0 auto;">
+            <p
+              style="
+                margin: 0;
+                margin-top: 17px;
+                font-size: 16px;
+                font-weight: 500;
+              "
+            >
+              hello ${name}
+            </p>
+            <p
+              style="
+                margin: 0;
+                margin-top: 17px;
+                font-weight: 500;
+                letter-spacing: 0.56px;
+              "
+            >
+              Thank you for choosing our Company. Use the following OTP
+              to complete the procedure to change your password. OTP is
+              valid for
+              <span style="font-weight: 600; color: #1f1f1f;">10 minutes</span>.
+              Do not share this code with others, including Archisketch
+              employees.
+            </p>
+            <p
+              style="
+                margin: 0;
+                margin-top: 60px;
+                font-size: 40px;
+                font-weight: 600;
+                letter-spacing: 25px;
+                color: #ba3d4f;
+              "
+            >
+              ${otpNumber}
+            </p>
+          </div>
+        </div>
 
-// @desc    Signup
-// @route   GET /api/v1/auth/signup
-// @access  Public
-exports.signup = asyncHandler(async (req, res, next) => {
-  // 1- Create user
-  const user = await User.create({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-  });
+        <p
+          style="
+            max-width: 400px;
+            margin: 0 auto;
+            margin-top: 90px;
+            text-align: center;
+            font-weight: 500;
+            color: #8c8c8c;
+          "
+        >
+          Need help? Ask at
+          <a
+            href="mailto:moustafaashraf20@gmail.com"
+            style="color: #499fb6; text-decoration: none;"
+            >moustafaashraf20@gmail.com</a
+          >
+          or visit our
+          <a
+            href=""
+            target="_blank"
+            style="color: #499fb6; text-decoration: none;"
+            >Help Center</a
+          >
+        </p>
+      </main>`;
+};
 
-  // 2- Generate token
-  const token = createToken(user._id);
+const congratulationsRegister = (name) => {
+  return `<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+        <div style="text-align: center; padding: 20px; background-color: #4CAF50; color: #fff; border-radius: 8px 8px 0 0;">
+            <h1 style="margin: 0; font-size: 28px;">🎉 Congratulations! 🎉</h1>
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <p style="font-size: 18px; color: #333;">Dear <strong>${name}</strong>,</p>
+            <p style="font-size: 18px; color: #333;">We are thrilled to congratulate you on your recent success!</p>
+            <p style="font-size: 18px; color: #333;">You have achieved something truly remarkable, and we are excited to celebrate this special moment with you.</p>
+            <p style="font-size: 16px; color: #333;">Keep up the great work, and we wish you continued success in all your future endeavors.</p>
+        </div>
+        <div style="text-align: center; margin-top: 30px; font-size: 14px; color: #888;">
+            <p>Best regards,</p>
+            <p>e commerce</p>
+        </div>
+    </div>
+</body>`;
+};
 
-  res.status(201).json({ data: user, token });
+exports.signup = asyncHandler(async (req, res) => {
+  const { password, email, ...otherData } = req.body;
+  const existedUser = await UserModel.findOne({ email });
+
+  if (existedUser) {
+    res.status(409);
+    throw new Error("User already existed");
+  }
+
+  // const hashedPassword = bcrypt.hashSync(password, 10);
+  const userData = {
+    ...otherData,
+    email: email,
+    password,
+  };
+  await UserModel.create(userData);
+  res.status(201).json({ message: "User added successfully" });
+  sendEmail(
+    userData.email,
+    "Thank You For Registration",
+    congratulationsRegister(userData.username)
+  );
 });
 
-// @desc    Login
-// @route   GET /api/v1/auth/login
-// @access  Public
-exports.login = asyncHandler(async (req, res, next) => {
-  // 1) check if password and email in the body (validation)
-  // 2) check if user exist & check if password is correct
-  const user = await User.findOne({ email: req.body.email });
 
-  if (!user || !(await bcrypt.compare(req.body.password, user.password))) {
-    return next(new ApiError('Incorrect email or password', 401));
+exports.login = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  const validUser = await UserModel.findOne({ email });
+  if (!validUser) {
+    res.status(404);
+    throw new Error("User not found");
   }
-  // 3) generate token
-  const token = createToken(user._id);
 
-  // Delete password from response
-  delete user._doc.password;
-  // 4) send response to client side
-  res.status(200).json({ data: user, token });
+  const checkPassword = await validUser.comparePassword(
+    req.body.password,
+    validUser.password
+  );
+  console.log("==", checkPassword);
+  console.log("Plain password: ", req.body.password);
+  console.log("Hashed password from DB: ", validUser.password);
+
+  if (!checkPassword) {
+    res.status(401);
+    throw new Error("Invalid email or password");
+  }
+
+  const token = generateToken(validUser._id);
+  const { password, ...rest } = validUser._doc;
+  res
+    .cookie("access_token", token, {
+      httpOnly: true,
+      sameSite: "strict",
+      maxAge: 1 * 24 * 60 * 60 * 1000,
+    })
+    .status(201)
+    .json(rest);
+});
+
+// sign in with google
+exports.authWithGoogle = asyncHandler(async (req, res) => {
+  // check if user already existed in database
+  const user = await UserModel.findOne({ email: req.body.email });
+  if (user) {
+    const token = generateToken(user._id);
+    res
+      .cookie("access_token", token, {
+        httpOnly: true,
+        sameSite: "strict",
+        maxAge: 1 * 24 * 60 * 60 * 1000, //  This is 1 hour
+      })
+      .status(200)
+      .json(user);
+  } else {
+    // if user doesn't exist in database
+    const generatePassword = Math.random().toString(36).slice(-8);
+    const hashedPassword = bcrypt.hashSync(generatePassword, 10);
+    const { username, email, photo } = req.body;
+    const newUser = new UserModel({
+      username,
+      email,
+      password: hashedPassword,
+      profilePicture: photo,
+    });
+
+    await newUser.save();
+    const token = generateToken(newUser._id);
+    res
+      .cookie("access_token", token, {
+        httpOnly: true,
+        sameSite: "strict",
+        maxAge: 1 * 60 * 60 * 1000, // Note: This is 1 hour
+      })
+      .status(201)
+      .json(newUser);
+  }
+});
+
+// sign out
+exports.signOut = asyncHandler(async (req, res) => {
+  res.clearCookie("access_token").status(200).json("Sign out success");
 });
 
 // @desc   make sure the user is logged in
@@ -53,14 +217,14 @@ exports.protect = asyncHandler(async (req, res, next) => {
   let token;
   if (
     req.headers.authorization &&
-    req.headers.authorization.startsWith('Bearer')
+    req.headers.authorization.startsWith("Bearer")
   ) {
-    token = req.headers.authorization.split(' ')[1];
+    token = req.headers.authorization.split(" ")[1];
   }
   if (!token) {
     return next(
       new ApiError(
-        'You are not login, Please login to get access this route',
+        "You are not login, Please login to get access this route",
         401
       )
     );
@@ -70,11 +234,12 @@ exports.protect = asyncHandler(async (req, res, next) => {
   const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
   // 3) Check if user exists
-  const currentUser = await User.findById(decoded.userId);
+  const currentUser = await UserModel.findById(decoded.id);
+
   if (!currentUser) {
     return next(
       new ApiError(
-        'The user that belong to this token does no longer exist',
+        "The user that belong to this token does no longer exist",
         401
       )
     );
@@ -90,7 +255,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
     if (passChangedTimestamp > decoded.iat) {
       return next(
         new ApiError(
-          'User recently changed his password. please login again..',
+          "User recently changed his password. please login again..",
           401
         )
       );
@@ -107,114 +272,62 @@ exports.allowedTo = (...roles) =>
   asyncHandler(async (req, res, next) => {
     // 1) access roles
     // 2) access registered user (req.user.role)
+
     if (!roles.includes(req.user.role)) {
       return next(
-        new ApiError('You are not allowed to access this route', 403)
+        new ApiError("You are not allowed to access this route", 403)
       );
     }
     next();
   });
 
-// @desc    Forgot password
-// @route   POST /api/v1/auth/forgotPassword
-// @access  Public
-exports.forgotPassword = asyncHandler(async (req, res, next) => {
-  // 1) Get user by email
-  const user = await User.findOne({ email: req.body.email });
-  if (!user) {
-    return next(
-      new ApiError(`There is no user with that email ${req.body.email}`, 404)
-    );
-  }
-  // 2) If user exist, Generate hash reset random 6 digits and save it in db
-  const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
-  const hashedResetCode = crypto
-    .createHash('sha256')
-    .update(resetCode)
-    .digest('hex');
+// handle reset password with send OTP mail
 
-  // Save hashed password reset code into db
-  user.passwordResetCode = hashedResetCode;
-  // Add expiration time for password reset code (10 min)
-  user.passwordResetExpires = Date.now() + 10 * 60 * 1000;
-  user.passwordResetVerified = false;
+exports.sendOtp = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  const user = await UserModel.findOne({ email });
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  const otp = generateOTP();
+  user.otp = otp; // to check valid otp or not
+  user.otpExpires = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
 
   await user.save();
 
-  // 3) Send the reset code via email
-  const message = `Hi ${user.name},\n We received a request to reset the password on your E-shop Account. \n ${resetCode} \n Enter this code to complete the reset. \n Thanks for helping us keep your account secure.\n The E-shop Team`;
-  try {
-    await sendEmail({
-      email: user.email,
-      subject: 'Your password reset code (valid for 10 min)',
-      message,
-    });
-  } catch (err) {
-    user.passwordResetCode = undefined;
-    user.passwordResetExpires = undefined;
-    user.passwordResetVerified = undefined;
-
-    await user.save();
-    return next(new ApiError('There is an error in sending email', 500));
-  }
-
-  res
-    .status(200)
-    .json({ status: 'Success', message: 'Reset code sent to email' });
+  // send otp to user
+  await sendEmail(
+    email,
+    "Password Reset OTP",
+    htmlForResetPAssword(otp, user.username)
+  );
+  res.status(200).json({ msg: "OTP sent to your email" });
 });
 
-// @desc    Verify password reset code
-// @route   POST /api/v1/auth/verifyResetCode
-// @access  Public
-exports.verifyPassResetCode = asyncHandler(async (req, res, next) => {
-  // 1) Get user based on reset code
-  const hashedResetCode = crypto
-    .createHash('sha256')
-    .update(req.body.resetCode)
-    .digest('hex');
+// Verify OTP and reset password
 
-  const user = await User.findOne({
-    passwordResetCode: hashedResetCode,
-    passwordResetExpires: { $gt: Date.now() },
+exports.verifyOTPAndResetPassword = asyncHandler(async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+
+  const user = await UserModel.findOne({
+    email,
+    otp,
+    otpExpires: { $gt: Date.now() },
   });
-  if (!user) {
-    return next(new ApiError('Reset code invalid or expired'));
-  }
+  console.log(user);
 
-  // 2) Reset code valid
-  user.passwordResetVerified = true;
+  if (!user) {
+    res.status(400);
+    throw new Error("Invalid OTP or OTP expired");
+  }
+  // hash new password
+  user.password = bcrypt.hashSync(newPassword, 10);
+  user.otp = undefined;
+  user.otpExpires = undefined; // Clear OTP
   await user.save();
 
-  res.status(200).json({
-    status: 'Success',
-  });
-});
-
-// @desc    Reset password
-// @route   POST /api/v1/auth/resetPassword
-// @access  Public
-exports.resetPassword = asyncHandler(async (req, res, next) => {
-  // 1) Get user based on email
-  const user = await User.findOne({ email: req.body.email });
-  if (!user) {
-    return next(
-      new ApiError(`There is no user with email ${req.body.email}`, 404)
-    );
-  }
-
-  // 2) Check if reset code verified
-  if (!user.passwordResetVerified) {
-    return next(new ApiError('Reset code not verified', 400));
-  }
-
-  user.password = req.body.newPassword;
-  user.passwordResetCode = undefined;
-  user.passwordResetExpires = undefined;
-  user.passwordResetVerified = undefined;
-
-  await user.save();
-
-  // 3) if everything is ok, generate token
-  const token = createToken(user._id);
-  res.status(200).json({ token });
+  res.status(200).json({ message: "Password reset successfully" });
 });

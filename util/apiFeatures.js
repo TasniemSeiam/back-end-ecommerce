@@ -75,10 +75,10 @@ class ApiFeatures {
     }
     return this;
   }
-  populate() { 
-    this.buildQuery= this.buildQuery.populate({ path: "category", select: "name" });
-    return this;
-  }
+  // populate() { 
+  //   this.buildQuery= this.buildQuery.populate({ path: "category", select: "name" });
+  //   return this;
+  // }
 }
 
 module.exports = ApiFeatures;

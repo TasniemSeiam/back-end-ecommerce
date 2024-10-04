@@ -4,6 +4,7 @@ const CategoryModel = require("../../models/category.model");
 const SubCategoryModel = require("../../models/subCategory.model");
 const { default: slugify } = require("slugify");
 const BrandModel = require("../../models/brand.model");
+const UserModel = require("../../models/User.model");
 
 exports.getProductValidator = [
   check("id")
@@ -72,6 +73,20 @@ exports.createProductValidator = [
         if (!category) {
           return Promise.reject(
             new Error(`No category for this id: ${categoryId}`)
+          );
+        }
+      })
+    ),
+  check("sellerId")
+    .notEmpty()
+    .withMessage("Product must be belong to a specific seller")
+    .isMongoId()
+    .withMessage("Invalid ID formate")
+    .custom((sellerId) =>
+      UserModel.findById(sellerId).then((seller) => {
+        if (!seller) {
+          return Promise.reject(
+            new Error(`No category for this id: ${sellerId}`)
           );
         }
       })

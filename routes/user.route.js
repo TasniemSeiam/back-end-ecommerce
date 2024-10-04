@@ -1,17 +1,14 @@
-const express = require('express');
+const express = require("express");
 const {
   getUserValidator,
-  createUserValidator,
-  updateUserValidator,
-  deleteUserValidator,
+  deleteUserValidation,
   changeUserPasswordValidator,
-  updateLoggedUserValidator,
-} = require('../util/validators/user.validator');
+  updateUserValidation,
+} = require("../util/validators/user.validator");
 
 const {
   getUsers,
   getUser,
-  createUser,
   updateUser,
   deleteUser,
   changeUserPassword,
@@ -19,38 +16,48 @@ const {
   updateLoggedUserPassword,
   updateLoggedUserData,
   deleteLoggedUserData,
-} = require('../controllers/user.controller');
+} = require("../controllers/user.controller");
 
-const auth = require('../controllers/Auth.controller');
+const auth = require("../controllers/Auth.controller");
+const validationMiddleware = require("../middleware/validator.middleware");
 
 const router = express.Router();
 
 router.use(auth.protect);
+router.get("/getMe", getLoggedUserData, getUser);
+router.put("/changeMyPassword", updateLoggedUserPassword);
+router.put("/updateMe", updateUserValidation, updateLoggedUserData);
+router.delete("/deleteMe", deleteLoggedUserData);
 
-router.get('/getMe', getLoggedUserData, getUser);
-router.put('/changeMyPassword', updateLoggedUserPassword);
-router.put('/updateMe', updateLoggedUserValidator, updateLoggedUserData);
-router.delete('/deleteMe', deleteLoggedUserData);
-
-// Admin
-router.use(auth.allowedTo('admin', 'manager'));
+// // Admin
+router.use(auth.allowedTo("admin", "seller"));
 router.put(
-  '/changePassword/:id',
+  "/changePassword/:id",
   changeUserPasswordValidator,
   changeUserPassword
 );
 
 // User
+router.route("/").get(auth.allowedTo("admin"), getUsers);
 router
-  .route('/')
-  .get(getUsers)
-  .post( createUserValidator, createUser);
-router
-  .route('/:id')
+  .route("/:id")
   .get(getUserValidator, getUser)
-  .put( updateUserValidator, updateUser)
-  .delete(deleteUserValidator, deleteUser);
+  // .put( updateUserValidation, updateUser)
+  .delete(deleteUserValidation, deleteUser);
+
+router.put(
+  "/update/:id",
+  auth.protect,
+  updateUserValidation,
+  validationMiddleware,
+  updateUser
+);
+router.delete(
+  "/delete/:id",
+  auth.protect,
+  deleteUserValidation,
+  validationMiddleware,
+  deleteUser
+);
 
 module.exports = router;
-
-//uploadUserImage, resizeImage,

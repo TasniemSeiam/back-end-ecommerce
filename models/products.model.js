@@ -1,5 +1,10 @@
 const mongoose = require("mongoose");
+const ReviewModel = require("./review.model");
 const { Schema } = mongoose;
+
+const generateProductId = () => {
+  return Math.floor(1000000000 + Math.random() * 9000000000).toString();
+};
 
 const productSchema = new Schema(
   {
@@ -37,12 +42,13 @@ const productSchema = new Schema(
 
     colors: [String],
     size: [String],
-    material:[String],
+    material: [String],
 
     imageCover: {
       type: String,
       required: [true, "image is required"],
     },
+
     images: [String],
 
     stock: {
@@ -71,6 +77,15 @@ const productSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Brand",
     },
+    sellerId: {
+      type: Schema.Types.ObjectId,
+      require: [true, "seller id is required "],
+      ref: "User",
+    },
+    productId: {
+      type: String,
+      unique: true,
+    },
     ratingsAverage: {
       type: Number,
       default: 0,
@@ -81,10 +96,44 @@ const productSchema = new Schema(
       type: Number,
       default: 0,
     },
-    reviews: [{ type: Schema.Types.ObjectId, ref: 'Review' }],
+    reviews: [{ type: Schema.Types.ObjectId, ref: "reviews" }],
   },
   { timestamps: true }
 );
+
+// Pre-save hook to generate a random productId if it doesn't already exist
+productSchema.pre("save", function (next) {
+  if (!this.productId) {
+    this.productId = generateProductId();
+  }
+  next();
+});
+
+productSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "category",
+    select: "name -_id",
+  });
+  // this.populate({
+  //   path: "subcategories",
+  //   select: "name -_id",
+  // });
+  this.populate({
+    path: "brand",
+    select: "name -_id",
+  });
+  next();
+});
+
+// Middleware to remove reviews associated with the product after deleting it
+productSchema.post("findOneAndDelete", async function (doc) {
+  if (doc) {
+    // Delete all reviews that belong to the deleted product
+    await ReviewModel.deleteMany({ product: doc._id });
+    console.log(`Deleted all reviews related to product: ${doc._id}`);
+  }
+});
+
 
 const ProductModel = mongoose.model("Product", productSchema);
 

@@ -1,49 +1,31 @@
-const asyncHandler = require('express-async-handler');
-const { v4: uuidv4 } = require('uuid');
-const sharp = require('sharp');
-const bcrypt = require('bcryptjs');
-
-const factory = require('./handlersFactory.controller');
-const ApiError = require('../util/AppHandleError');
-// const { uploadSingleImage } = require('../middlewares/uploadImageMiddleware');
-const createToken = require('../util/createToken');
-const User = require('../models/User.model');
-
-// Upload single image
-// exports.uploadUserImage = uploadSingleImage('profileImg');
-
-// Image processing
-exports.resizeImage = asyncHandler(async (req, res, next) => {
-  const filename = `user-${uuidv4()}-${Date.now()}.jpeg`;
-
-  if (req.file) {
-    await sharp(req.file.buffer)
-      .resize(600, 600)
-      .toFormat('jpeg')
-      .jpeg({ quality: 95 })
-      .toFile(`uploads/users/${filename}`);
-
-    // Save image into our db
-    req.body.profileImg = filename;
-  }
-
-  next();
-});
+const asyncHandler = require("express-async-handler");
+const bcrypt = require("bcryptjs");
+const UserModel = require("../models/User.model");
+const factory = require("./handlersFactory.controller");
+const ApiError = require("../util/AppHandleError");
+const generateToken = require("../util/generateToken");
 
 // @desc    Get list of users
 // @route   GET /api/v1/users
 // @access  Private/Admin
-exports.getUsers = factory.getAll(User);
+exports.getUsers = asyncHandler(async (req, res) => {
+  const users = await UserModel.find().select("-password");
+  if (users.length === 0) {
+    return res.status(404).json({ message: "No users found" });
+  }
+
+  res.json(users);
+});
 
 // @desc    Get specific user by id
 // @route   GET /api/v1/users/:id
 // @access  Private/Admin
-exports.getUser = factory.getOne(User);
+exports.getUser = factory.getOne(UserModel);
 
 // @desc    Create user
 // @route   POST  /api/v1/users
 // @access  Private/Admin
-exports.createUser = factory.createOne(User);
+exports.createUser = factory.createOne(UserModel);
 
 // @desc    Update specific user
 // @route   PUT /api/v1/users/:id
@@ -52,7 +34,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   const document = await User.findByIdAndUpdate(
     req.params.id,
     {
-      name: req.body.name,
+      username: req.body.username,
       slug: req.body.slug,
       phone: req.body.phone,
       email: req.body.email,
@@ -71,7 +53,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
 });
 
 exports.changeUserPassword = asyncHandler(async (req, res, next) => {
-  const document = await User.findByIdAndUpdate(
+  const document = await UserModel.findByIdAndUpdate(
     req.params.id,
     {
       password: await bcrypt.hash(req.body.password, 12),
@@ -91,7 +73,16 @@ exports.changeUserPassword = asyncHandler(async (req, res, next) => {
 // @desc    Delete specific user
 // @route   DELETE /api/v1/users/:id
 // @access  Private/Admin
-exports.deleteUser = factory.deleteOne(User);
+exports.deleteUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  if (req.user.id !== id) {
+    res.status(403);
+    throw new Error("You can delete only your account");
+  } else {
+    await UserModel.findByIdAndDelete(id);
+    res.status(200).json("User has been deleted");
+  }
+});
 
 // @desc    Get Logged user data
 // @route   GET /api/v1/users/getMe
@@ -106,7 +97,7 @@ exports.getLoggedUserData = asyncHandler(async (req, res, next) => {
 // @access  Private/Protect
 exports.updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
   // 1) Update user password based user payload (req.user._id)
-  const user = await User.findByIdAndUpdate(
+  const user = await UserModel.findByIdAndUpdate(
     req.user._id,
     {
       password: await bcrypt.hash(req.body.password, 12),
@@ -118,7 +109,7 @@ exports.updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
   );
 
   // 2) Generate token
-  const token = createToken(user._id);
+  const token = generateToken(user._id);
 
   res.status(200).json({ data: user, token });
 });
@@ -127,10 +118,10 @@ exports.updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/users/updateMe
 // @access  Private/Protect
 exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
-  const updatedUser = await User.findByIdAndUpdate(
+  const updatedUser = await UserModel.findByIdAndUpdate(
     req.user._id,
     {
-      name: req.body.name,
+      username: req.body.username,
       email: req.body.email,
       phone: req.body.phone,
     },
@@ -144,7 +135,7 @@ exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
 // @route   DELETE /api/v1/users/deleteMe
 // @access  Private/Protect
 exports.deleteLoggedUserData = asyncHandler(async (req, res, next) => {
-  await User.findByIdAndUpdate(req.user._id, { active: false });
+  await UserModel.findByIdAndUpdate(req.user._id, { active: false });
 
-  res.status(204).json({ status: 'Success' });
+  res.status(204).json({ status: "Success" });
 });

@@ -27,7 +27,7 @@ router
   .get(getAllProducts)
   .post(
     auth.protect,
-    auth.allowedTo("admin", "manager"),
+    auth.allowedTo("admin", "seller"),
     uploadImage,
     handelUpload,
     createProductValidator,
@@ -39,7 +39,7 @@ router
   .get(getProductValidator, getProductById)
   .put(
     auth.protect,
-    auth.allowedTo("admin", "manager"),
+    auth.allowedTo("admin", "seller"),
     uploadImage,
     handelUpload,
     updateProductValidator,
@@ -47,7 +47,7 @@ router
   )
   .delete(
     auth.protect,
-    auth.allowedTo("admin"),
+    auth.allowedTo("admin","seller"),
     deleteProductValidator,
     deleteProduct
   );

@@ -2,7 +2,7 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET);
 const asyncHandler = require("express-async-handler");
 const ApiError = require("../util/AppHandleError");
 
-const User = require("../models/User.model");
+const UserModel = require("../models/User.model");
 const Product = require("../models/products.model");
 const Cart = require("../models/Cart.model");
 const Order = require("../models/Order.model");
@@ -190,7 +190,7 @@ const createCardOrder = async (session) => {
   const oderPrice = session.amount_total / 100;
 
   const cart = await Cart.findById(cartId);
-  const user = await User.findOne({ email: session.customer_email });
+  const user = await UserModel.findOne({ email: session.customer_email });
 
   const order = await Order.create({
     user: user._id,
