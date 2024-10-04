@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+<<<<<<< HEAD
 const ReviewModel = require("./review.model");
 const { Schema } = mongoose;
 
@@ -6,6 +7,10 @@ const generateProductId = () => {
   return Math.floor(1000000000 + Math.random() * 9000000000).toString();
 };
 
+=======
+const { Schema } = mongoose;
+
+>>>>>>> origin/main
 const productSchema = new Schema(
   {
     title: {
@@ -48,7 +53,10 @@ const productSchema = new Schema(
       type: String,
       required: [true, "image is required"],
     },
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
     images: [String],
 
     stock: {
@@ -77,6 +85,7 @@ const productSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Brand",
     },
+<<<<<<< HEAD
     sellerId: {
       type: Schema.Types.ObjectId,
       require: [true, "seller id is required "],
@@ -86,6 +95,8 @@ const productSchema = new Schema(
       type: String,
       unique: true,
     },
+=======
+>>>>>>> origin/main
     ratingsAverage: {
       type: Number,
       default: 0,
@@ -96,11 +107,16 @@ const productSchema = new Schema(
       type: Number,
       default: 0,
     },
+<<<<<<< HEAD
     reviews: [{ type: Schema.Types.ObjectId, ref: "reviews" }],
+=======
+    reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }],
+>>>>>>> origin/main
   },
   { timestamps: true }
 );
 
+<<<<<<< HEAD
 // Pre-save hook to generate a random productId if it doesn't already exist
 productSchema.pre("save", function (next) {
   if (!this.productId) {
@@ -109,6 +125,8 @@ productSchema.pre("save", function (next) {
   next();
 });
 
+=======
+>>>>>>> origin/main
 productSchema.pre(/^find/, function (next) {
   this.populate({
     path: "category",
@@ -125,6 +143,7 @@ productSchema.pre(/^find/, function (next) {
   next();
 });
 
+<<<<<<< HEAD
 // Middleware to remove reviews associated with the product after deleting it
 productSchema.post("findOneAndDelete", async function (doc) {
   if (doc) {
@@ -135,6 +154,8 @@ productSchema.post("findOneAndDelete", async function (doc) {
 });
 
 
+=======
+>>>>>>> origin/main
 const ProductModel = mongoose.model("Product", productSchema);
 
 module.exports = ProductModel;
