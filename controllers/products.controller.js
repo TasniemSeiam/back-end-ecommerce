@@ -9,7 +9,7 @@ const upload = uploadMiddleware("product-image");
 
 const uploadImage = upload.fields([
   { name: "imageCover", maxCount: 1 },
-  { name: "images", maxCount: 5 },
+  { name: "images", maxCount: 3 },
 ]);
 
 

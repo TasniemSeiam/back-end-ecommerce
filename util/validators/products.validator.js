@@ -38,8 +38,8 @@ exports.createProductValidator = [
     .optional()
     .isNumeric()
     .custom((value, { req }) => {
-      if (req.body.price <= value) {
-        throw new Error("price after discount must be lower than price");
+      if (Number(value) > Number(req.body.price)) {
+        throw new Error(`price after discount (${value}) must be lower than the price (${req.body.price})`);
       }
       return true;
     }),
