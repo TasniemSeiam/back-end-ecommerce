@@ -16,7 +16,7 @@ const registerVaildation = [
       return true;
     }),
 
-    check("email")
+  check("email")
     .notEmpty()
     .withMessage("Email required")
     .isEmail()
@@ -97,12 +97,15 @@ const signInValidation = [
 ];
 
 const updateUserValidation = [
-  body("username")
-    .optional()
-    .trim()
+  check("username")
+    .notEmpty()
+    .withMessage("User required")
     .isLength({ min: 3 })
-    .withMessage("Name must be at least 3 characters")
-    .escape(),
+    .withMessage("Too short User name")
+    .custom((val, { req }) => {
+      req.body.slug = slugify(val);
+      return true;
+    }),
 
   body("email")
     .optional()
@@ -163,17 +166,15 @@ const deleteUserValidation = [
 ];
 
 const emailForResetValidation = [
-  body("email")
-    .not()
-    .isEmpty()
+  check("email")
+    .notEmpty()
     .withMessage("email required")
     .isEmail()
     .withMessage("Please provide a valid email"),
 ];
 const verifyOTPAndResetPasswordValidation = [
-  body("email")
-    .not()
-    .isEmpty()
+  check("email")
+    .notEmpty()
     .withMessage("email required")
     .isEmail()
     .withMessage("Please provide a valid email")
@@ -181,21 +182,15 @@ const verifyOTPAndResetPasswordValidation = [
 
   body("otp").not().isEmpty().withMessage("OTP is required"),
 
-  body("newPassword")
-    .not()
-    .isEmpty()
-    .withMessage("password is required")
-    .trim()
-    .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters")
-    .matches(/\d/)
-    .withMessage("Password must contain at least one number")
-    .matches(/[A-Z]/)
-    .withMessage("Password must contain at least one uppercase letter")
-    .matches(/[a-z]/)
-    .withMessage("Password must contain at least one lowercase letter")
-    .matches(/[\W]/)
-    .withMessage("Password must contain at least one special character"),
+  check("newPassword")
+    .notEmpty()
+    .withMessage("Password required")
+    .isLength({ min: 8 })
+    .withMessage("Password must be at least 8 characters")
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/)
+    .withMessage(
+      "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+    ),
 ];
 const changeUserPasswordValidator = [
   body("id").isMongoId().withMessage("Invalid User id format"),
