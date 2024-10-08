@@ -3,6 +3,7 @@ const {
   getUserValidator,
   deleteUserValidation,
   changeUserPasswordValidator,
+  changeMyPasswordValidator,
   updateUserValidation,
 } = require("../util/validators/user.validator");
 
@@ -25,7 +26,7 @@ const router = express.Router();
 
 router.use(auth.protect);
 router.get("/getMe", getLoggedUserData, getUser);
-router.put("/changeMyPassword", updateLoggedUserPassword);
+router.put("/changeMyPassword", changeMyPasswordValidator,updateLoggedUserPassword);
 router.put("/updateMe", updateUserValidation, updateLoggedUserData);
 router.delete("/deleteMe", deleteLoggedUserData);
 

@@ -110,7 +110,7 @@ const congratulationsRegister = (name) => {
 };
 
 exports.signup = asyncHandler(async (req, res) => {
-  const { password, email, ...otherData } = req.body;
+  const { password, email, address, ...otherData } = req.body;
   const existedUser = await UserModel.findOne({ email });
 
   if (existedUser) {
@@ -118,11 +118,11 @@ exports.signup = asyncHandler(async (req, res) => {
     throw new Error("User already existed");
   }
 
-  // const hashedPassword = bcrypt.hashSync(password, 10);
   const userData = {
     ...otherData,
     email: email,
     password,
+    addresses: [address],
   };
   await UserModel.create(userData);
   res.status(201).json({ message: "User added successfully" });
@@ -132,7 +132,6 @@ exports.signup = asyncHandler(async (req, res) => {
     congratulationsRegister(userData.username)
   );
 });
-
 
 exports.login = asyncHandler(async (req, res) => {
   const { email } = req.body;
@@ -214,8 +213,8 @@ exports.signOut = asyncHandler(async (req, res) => {
 // @desc   make sure the user is logged in
 exports.protect = asyncHandler(async (req, res, next) => {
   // 1) Check if token exist, if exist get
-  
-  const token = req.cookies['access_token'];
+
+  const token = req.cookies["access_token"];
   if (!token) {
     return next(
       new ApiError(
@@ -261,7 +260,6 @@ exports.protect = asyncHandler(async (req, res, next) => {
   next();
 });
 
-// @desc    Authorization (User Permissions)
 // ["admin", "manager"]
 exports.allowedTo = (...roles) =>
   asyncHandler(async (req, res, next) => {
@@ -319,7 +317,7 @@ exports.verifyOTPAndResetPassword = asyncHandler(async (req, res) => {
     throw new Error("Invalid OTP or OTP expired");
   }
   // hash new password
-  user.password = bcrypt.hashSync(newPassword, 10);
+  user.password = newPassword;
   user.otp = undefined;
   user.otpExpires = undefined; // Clear OTP
   await user.save();

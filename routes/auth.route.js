@@ -16,13 +16,13 @@ const { registerVaildation, emailForResetValidation, verifyOTPAndResetPasswordVa
 
 const router = express.Router();
 
-router.post('/signup', registerVaildation, signup);
+router.post('/signup', registerVaildation,validationMiddleware, signup);
 router.post('/login', loginValidator, login);
 router.post('/auth/google',authWithGoogle);
 router.get('/sign-out',signOut);
 
 router.post("/reset-password",verifyOTPAndResetPasswordValidation,validationMiddleware,verifyOTPAndResetPassword)
-router.post("/send-otp",emailForResetValidation,sendOtp)
+router.post("/send-otp",emailForResetValidation,validationMiddleware,sendOtp)
 
 
 module.exports = router;

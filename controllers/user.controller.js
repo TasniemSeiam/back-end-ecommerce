@@ -92,9 +92,7 @@ exports.getLoggedUserData = asyncHandler(async (req, res, next) => {
   next();
 });
 
-// @desc    Update logged user password
 // @route   PUT /api/v1/users/updateMyPassword
-// @access  Private/Protect
 exports.updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
   // 1) Update user password based user payload (req.user._id)
   const user = await UserModel.findByIdAndUpdate(
@@ -107,16 +105,13 @@ exports.updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
       new: true,
     }
   );
-
-  // 2) Generate token
   const token = generateToken(user._id);
 
   res.status(200).json({ data: user, token });
 });
 
-// @desc    Update logged user data (without password, role)
+
 // @route   PUT /api/v1/users/updateMe
-// @access  Private/Protect
 exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
   const updatedUser = await UserModel.findByIdAndUpdate(
     req.user._id,
@@ -124,12 +119,15 @@ exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
       username: req.body.username,
       email: req.body.email,
       phone: req.body.phone,
+      profilePicture: req.body.profilePicture,
+      $addToSet: { addresses: req.body.address }, 
     },
     { new: true }
   );
 
   res.status(200).json({ data: updatedUser });
 });
+
 
 // @desc    Deactivate logged user
 // @route   DELETE /api/v1/users/deleteMe
