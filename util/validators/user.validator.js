@@ -1,4 +1,4 @@
-const { body, param } = require("express-validator");
+const { body, param, check } = require("express-validator");
 const slugify = require("slugify");
 const bcrypt = require("bcryptjs");
 // const { check, body } = require("express-validator");
@@ -6,39 +6,50 @@ const validatorMiddleware = require("../../middleware/validator.middleware");
 const UserModel = require("../../models/User.model");
 
 const registerVaildation = [
-  body("username")
-    .not()
-    .isEmpty()
-    .withMessage("Name is required")
-    .trim()
+  check("username")
+    .notEmpty()
+    .withMessage("User required")
     .isLength({ min: 3 })
-    .withMessage("Name must be at least 3 characters")
-    .escape(),
+    .withMessage("Too short User name")
+    .custom((val, { req }) => {
+      req.body.slug = slugify(val);
+      return true;
+    }),
 
-  body("email")
-    .not()
-    .isEmpty()
-    .withMessage("email is required")
-    .trim()
+    check("email")
+    .notEmpty()
+    .withMessage("Email required")
     .isEmail()
-    .withMessage("Please enter a valid email address")
-    .normalizeEmail(),
+    .withMessage("Invalid email address")
+    .custom((val) =>
+      UserModel.findOne({ email: val }).then((user) => {
+        if (user) {
+          return Promise.reject(new Error("E-mail already in user"));
+        }
+      })
+    ),
 
-  body("password")
-    .not()
-    .isEmpty()
-    .withMessage("password is required")
-    .trim()
-    .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters")
-    .matches(/\d/)
-    .withMessage("Password must contain at least one number")
-    .matches(/[A-Z]/)
-    .withMessage("Password must contain at least one uppercase letter")
-    .matches(/[a-z]/)
-    .withMessage("Password must contain at least one lowercase letter")
-    .matches(/[\W]/)
-    .withMessage("Password must contain at least one special character"),
+  check("password")
+    .notEmpty()
+    .withMessage("Password required")
+    .isLength({ min: 8 })
+    .withMessage("Password must be at least 8 characters")
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/)
+    .withMessage(
+      "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+    )
+    .custom((password, { req }) => {
+      if (password !== req.body.passwordConfirm) {
+        throw new Error("Password Confirmation incorrect");
+      }
+      return true;
+    }),
+
+  check("passwordConfirm")
+    .notEmpty()
+    .withMessage("Password confirmation required"),
+
+  validatorMiddleware,
 
   body("phone")
     .not()
@@ -220,9 +231,9 @@ const changeUserPasswordValidator = [
   validatorMiddleware,
 ];
 const getUserValidator = [
-    body('id').isMongoId().withMessage('Invalid User id format'),
-    validatorMiddleware,
-  ];
+  body("id").isMongoId().withMessage("Invalid User id format"),
+  validatorMiddleware,
+];
 
 module.exports = {
   registerVaildation,
@@ -232,5 +243,5 @@ module.exports = {
   emailForResetValidation,
   verifyOTPAndResetPasswordValidation,
   changeUserPasswordValidator,
-  getUserValidator
+  getUserValidator,
 };

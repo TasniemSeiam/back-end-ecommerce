@@ -214,13 +214,8 @@ exports.signOut = asyncHandler(async (req, res) => {
 // @desc   make sure the user is logged in
 exports.protect = asyncHandler(async (req, res, next) => {
   // 1) Check if token exist, if exist get
-  let token;
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    token = req.headers.authorization.split(" ")[1];
-  }
+  
+  const token = req.cookies['access_token'];
   if (!token) {
     return next(
       new ApiError(
