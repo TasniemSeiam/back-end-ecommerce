@@ -1,7 +1,6 @@
 const { body, param, check } = require("express-validator");
 const slugify = require("slugify");
 const bcrypt = require("bcryptjs");
-// const { check, body } = require("express-validator");
 const validatorMiddleware = require("../../middleware/validator.middleware");
 const UserModel = require("../../models/User.model");
 
@@ -193,33 +192,33 @@ const verifyOTPAndResetPasswordValidation = [
     ),
 ];
 const changeUserPasswordValidator = [
-  body("id").isMongoId().withMessage("Invalid User id format"),
-  param("currentPassword")
+  check('id').isMongoId().withMessage('Invalid User id format'),
+  body('currentPassword')
     .notEmpty()
-    .withMessage("You must enter your current password"),
-  param("passwordConfirm")
+    .withMessage('You must enter your current password'),
+  body('passwordConfirm')
     .notEmpty()
-    .withMessage("You must enter the password confirm"),
-  param("password")
+    .withMessage('You must enter the password confirm'),
+  body('password')
     .notEmpty()
-    .withMessage("You must enter new password")
+    .withMessage('You must enter new password')
     .custom(async (val, { req }) => {
       // 1) Verify current password
       const user = await UserModel.findById(req.params.id);
       if (!user) {
-        throw new Error("There is no user for this id");
+        throw new Error('There is no user for this id');
       }
-      const isCorrectPassword = await bcrypt.compare(
+      const isCorrectPassword = await UserModel.comparePassword(
         req.body.currentPassword,
         user.password
       );
       if (!isCorrectPassword) {
-        throw new Error("Incorrect current password");
+        throw new Error('Incorrect current password');
       }
 
       // 2) Verify password confirm
       if (val !== req.body.passwordConfirm) {
-        throw new Error("Password Confirmation incorrect");
+        throw new Error('Password Confirmation incorrect');
       }
       return true;
     }),
@@ -227,6 +226,38 @@ const changeUserPasswordValidator = [
 ];
 const getUserValidator = [
   body("id").isMongoId().withMessage("Invalid User id format"),
+  validatorMiddleware,
+];
+const changeMyPasswordValidator = [
+  body('currentPassword')
+    .notEmpty()
+    .withMessage('You must enter your current password'),
+  body('passwordConfirm')
+    .notEmpty()
+    .withMessage('You must enter the password confirm'),
+  body('password')
+    .notEmpty()
+    .withMessage('You must enter new password')
+    .custom(async (val, { req }) => {
+      // 1) Verify current password
+      const user = await UserModel.findById(req.user._id);
+      if (!user) {
+        throw new Error('There is no user for this id');
+      }
+      const isCorrectPassword = await user.comparePassword(
+        req.body.currentPassword,
+        user.password
+      );
+      if (!isCorrectPassword) {
+        throw new Error('Incorrect current password');
+      }
+
+      // 2) Verify password confirm
+      if (val !== req.body.passwordConfirm) {
+        throw new Error('Password Confirmation incorrect');
+      }
+      return true;
+    }),
   validatorMiddleware,
 ];
 
@@ -239,4 +270,5 @@ module.exports = {
   verifyOTPAndResetPasswordValidation,
   changeUserPasswordValidator,
   getUserValidator,
+  changeMyPasswordValidator,
 };

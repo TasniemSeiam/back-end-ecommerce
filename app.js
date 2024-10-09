@@ -25,8 +25,14 @@ const orderRoute = require("./routes/Order.route");
 const reviewRoute = require("./routes/review.router");
 const { webhookCheckout } = require("./controllers/Order.controller");
 
-app.use(cors());
-app.options('*', cors());
+
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  credentials: true,         
+  optionSuccessStatus: 200
+}
+app.use(cors(  corsOptions));
+app.options('*', cors(  corsOptions));
 
 
 // Set security HTTP headers
