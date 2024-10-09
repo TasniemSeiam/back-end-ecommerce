@@ -12,6 +12,7 @@ const uploadImage = upload.fields([
   { name: "images", maxCount: 3 },
 ]);
 
+let prevCoverImage;
 
 const handelUpload = (req, res, next) => {
   // Ensure the cover image is uploaded
@@ -21,7 +22,7 @@ const handelUpload = (req, res, next) => {
 
   // Get the Cloudinary URL for the cover image
   req.body.imageCover = req.files.imageCover[0].path;
-
+  prevCoverImage=req.body.imageCover;
   // Get the Cloudinary URLs for additional images
   if (req.files.images) {
     // Map each file to its Cloudinary URL (flatten array of strings)
@@ -33,6 +34,21 @@ const handelUpload = (req, res, next) => {
   // Proceed to the next middleware
   next();
 };
+const handelUploadForUpdate = (req, res, next) => {
+  
+  if (req.files && req.files.imageCover) {
+    // Get the Cloudinary URL for the cover image
+    req.body.imageCover = req.files.imageCover[0].path;
+  } 
+  // Get the Cloudinary URLs for additional images
+  if (req.files && req.files.images) {
+    // Map each file to its Cloudinary URL (flatten array of strings)
+    req.body.images = req.files.images.map(file => file.path);
+  }
+  // Proceed to the next middleware
+  next();
+};
+
 
 
 // @desc    Create product
@@ -68,4 +84,5 @@ module.exports = {
   deleteProduct,
   uploadImage,
   handelUpload,
+  handelUploadForUpdate
 };

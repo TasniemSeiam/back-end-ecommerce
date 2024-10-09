@@ -5,6 +5,7 @@ const {
   getProductById,
   updateProduct,
   deleteProduct,
+  handelUploadForUpdate,
 } = require("../controllers/products.controller");
 const {
   createProductValidator,
@@ -41,7 +42,7 @@ router
     auth.protect,
     auth.allowedTo("admin", "seller"),
     uploadImage,
-    handelUpload,
+    handelUploadForUpdate,
     updateProductValidator,
     updateProduct
   )
