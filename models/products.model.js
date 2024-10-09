@@ -90,7 +90,7 @@ const productSchema = new Schema(
     ratingsAverage: {
       type: Number,
       default: 0,
-      min: 1,
+      min: 0,
       max: 5,
     },
     ratingQuantity: {
