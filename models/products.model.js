@@ -73,10 +73,11 @@ const productSchema = new Schema(
         ref: "SubCategory",
       },
     ],
-    brand: {
-      type: Schema.Types.ObjectId,
-      ref: "Brand",
-    },
+    // brand: {
+    //   type: Schema.Types.ObjectId,
+    //   ref: "Brand",
+    // },
+    brand:{type:String},
     sellerId: {
       type: Schema.Types.ObjectId,
       require: [true, "seller id is required "],
@@ -118,10 +119,10 @@ productSchema.pre(/^find/, function (next) {
   //   path: "subcategories",
   //   select: "name -_id",
   // });
-  this.populate({
-    path: "brand",
-    select: "name -_id",
-  });
+  // this.populate({
+  //   path: "brand",
+  //   select: "name -_id",
+  // });
   next();
 });
 
