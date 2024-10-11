@@ -46,6 +46,7 @@ router
   // .put( updateUserValidation, updateUser)
   .delete(deleteUserValidation, deleteUser);
 
+  //admin
 router.put(
   "/update/:id",
   auth.protect,
