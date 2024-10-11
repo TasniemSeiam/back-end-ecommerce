@@ -27,7 +27,7 @@ const { webhookCheckout } = require("./controllers/Order.controller");
 
 
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: ['http://localhost:3000','http://localhost:3001'],
   credentials: true,         
   optionSuccessStatus: 200
 }
@@ -86,12 +86,12 @@ if (env === "development") {
 // }
 
 //limit requests from the same IP
-const Limiter = rateLimit({
-  max: 50,
-  windowMs: 60 * 60 * 1000,
-  message: "To many requests ,please try again in an hour....",
-});
-app.use("/", Limiter);
+// const Limiter = rateLimit({
+//   max: 50,
+//   windowMs: 60 * 60 * 1000,
+//   message: "To many requests ,please try again in an hour....",
+// });
+// app.use("/", Limiter);
 
 // app.use((req,res,next)=>{
 //     console.log(req.headers);
