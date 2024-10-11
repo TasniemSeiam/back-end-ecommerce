@@ -132,22 +132,22 @@ exports.createProductValidator = [
     ),
 
   check("brand")
-    .optional()
-    .isMongoId()
-    .withMessage("Invalid ID formate")
-    .custom((brandId) =>
-      BrandModel.findById(brandId).then((brand) => {
-        if (!brand) {
-          return Promise.reject(new Error(`No brand for this id: ${brandId}`));
-        }
-      })
-    ),
+    .optional(),
+    // .isMongoId()
+    // .withMessage("Invalid ID formate")
+    // .custom((brandId) =>
+    //   BrandModel.findById(brandId).then((brand) => {
+    //     if (!brand) {
+    //       return Promise.reject(new Error(`No brand for this id: ${brandId}`));
+    //     }
+    //   })
+    // ),
 
   check("ratingsAverage")
     .optional()
     .isNumeric()
-    .isLength({ min: 1, max: 5 })
-    .withMessage("rating must be between 1 and 5"),
+    .isLength({ min: 0, max: 5 })
+    .withMessage("rating must be between 0 and 5"),
 
   check("ratingQuantity").optional().isNumeric(),
 

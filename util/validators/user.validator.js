@@ -51,9 +51,7 @@ const registerVaildation = [
   validatorMiddleware,
 
   body("phone")
-    .not()
-    .isEmpty()
-    .withMessage("phone is required")
+    .optional()
     .trim()
     .isMobilePhone()
     .withMessage("Please enter a valid phone number")
@@ -79,8 +77,9 @@ const registerVaildation = [
     .escape(),
 
   body("address.zipcode")
-    .isPostalCode("any")
-    .withMessage("Please enter a valid zipcode")
+    .optional()
+    // .isPostalCode("any")
+    // .withMessage("Please enter a valid zipcode")
     .trim(),
 ];
 

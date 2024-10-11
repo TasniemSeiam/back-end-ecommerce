@@ -106,9 +106,11 @@ userSchema.post("findOneAndDelete", async function (doc) {
     await OrderModel.deleteMany({ user: doc._id });
     // console.log(`Deleted all orders related to user: ${doc._id}`);
     
-    // Delete all wishlist that belong to the deleted user
+    // Delete all cart that belong to the deleted user
     await CartModel.deleteMany({ user: doc._id });
+
     // console.log(`Deleted all wishlist related to user: ${doc._id}`);
+
 
 
 

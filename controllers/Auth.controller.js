@@ -183,6 +183,7 @@ exports.authWithGoogle = asyncHandler(async (req, res) => {
   } else {
     // if user doesn't exist in database
     const generatePassword = Math.random().toString(36).slice(-8);
+
     const { username, email, photo } = req.body;
     const newUser = new UserModel({
       username,
