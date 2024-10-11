@@ -145,9 +145,9 @@ exports.login = asyncHandler(async (req, res) => {
     req.body.password,
     validUser.password
   );
-  console.log("==", checkPassword);
-  console.log("Plain password: ", req.body.password);
-  console.log("Hashed password from DB: ", validUser.password);
+  // console.log("==", checkPassword);
+  // console.log("Plain password: ", req.body.password);
+  // console.log("Hashed password from DB: ", validUser.password);
 
   if (!checkPassword) {
     res.status(401);
@@ -183,12 +183,11 @@ exports.authWithGoogle = asyncHandler(async (req, res) => {
   } else {
     // if user doesn't exist in database
     const generatePassword = Math.random().toString(36).slice(-8);
-    const hashedPassword = bcrypt.hashSync(generatePassword, 10);
     const { username, email, photo } = req.body;
     const newUser = new UserModel({
       username,
       email,
-      password: hashedPassword,
+      password: generatePassword,
       profilePicture: photo,
     });
 
@@ -310,7 +309,7 @@ exports.verifyOTPAndResetPassword = asyncHandler(async (req, res) => {
     otp,
     otpExpires: { $gt: Date.now() },
   });
-  console.log(user);
+  // console.log(user);
 
   if (!user) {
     res.status(400);
