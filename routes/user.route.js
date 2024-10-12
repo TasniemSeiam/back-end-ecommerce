@@ -18,11 +18,14 @@ const {
   updateLoggedUserData,
   deleteLoggedUserData,
 } = require("../controllers/user.controller");
+const productsRoute = require("./products.route");
 
 const auth = require("../controllers/Auth.controller");
 const validationMiddleware = require("../middleware/validator.middleware");
 
 const router = express.Router();
+router.use("/:userId/products", productsRoute);
+
 
 router.use(auth.protect);
 router.get("/getMe", getLoggedUserData, getUser);

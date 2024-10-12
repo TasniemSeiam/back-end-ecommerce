@@ -6,7 +6,7 @@ class ApiFeatures {
 
   paginate(countDocuments) {
     const page = this.queryString.page * 1 || 1;
-    const limit = this.queryString.limit * 1 || 10;
+    const limit = this.queryString.limit * 1;
     const skip = (page - 1) * limit;
 
     const paginate = {};
@@ -75,7 +75,7 @@ class ApiFeatures {
     }
     return this;
   }
-  // populate() { 
+  // populate() {
   //   this.buildQuery= this.buildQuery.populate({ path: "category", select: "name" });
   //   return this;
   // }

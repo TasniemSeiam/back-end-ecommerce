@@ -6,6 +6,9 @@ const {
   updateProduct,
   deleteProduct,
   handelUploadForUpdate,
+  setUserId,
+  createFilterObj,
+  createFilterSubCategory,
 } = require("../controllers/products.controller");
 const {
   createProductValidator,
@@ -20,20 +23,30 @@ const {
 } = require("../controllers/products.controller");
 
 const auth = require("../controllers/Auth.controller");
+const reviewsRoute = require("./review.router");
 
-const router = express.Router();
+// const router = express.Router();
+const router = express.Router({ mergeParams: true });
+router.use("/:productId/reviews", reviewsRoute);
+
 
 router
   .route("/")
-  .get(getAllProducts)
+  .get(createFilterObj, getAllProducts)
   .post(
     auth.protect,
     auth.allowedTo("admin", "seller"),
+    setUserId,
     uploadImage,
     handelUpload,
     createProductValidator,
     createNewProduct
-  );
+);
+  
+// Route for filtering products by subcategory
+router
+  .route("/subcategory")
+  .get(createFilterSubCategory, getAllProducts); // This will now filter by subcategory
 
 router
   .route("/:id")
@@ -41,6 +54,7 @@ router
   .put(
     auth.protect,
     auth.allowedTo("admin", "seller"),
+    setUserId,
     uploadImage,
     handelUploadForUpdate,
     updateProductValidator,
@@ -48,7 +62,7 @@ router
   )
   .delete(
     auth.protect,
-    auth.allowedTo("admin","seller"),
+    auth.allowedTo("admin", "seller"),
     deleteProductValidator,
     deleteProduct
   );

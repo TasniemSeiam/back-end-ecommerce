@@ -15,9 +15,12 @@ const {
   deleteSubCategoryValidator,
 } = require("../util/validators/subCategory.validator");
 const auth = require('../controllers/Auth.controller');
+const productsRoute = require("./products.route");
 
 
 const router = express.Router({ mergeParams: true });
+router.use("/:subcategoryId/products", productsRoute);
+
 
 router
   .route("/")
