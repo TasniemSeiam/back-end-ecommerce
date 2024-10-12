@@ -115,6 +115,10 @@ productSchema.pre(/^find/, function (next) {
     path: "category",
     select: "name -_id",
   });
+  this.populate({
+    path: "sellerId",
+    select: "username",
+  });
   // this.populate({
   //   path: "subcategories",
   //   select: "name -_id",
