@@ -27,7 +27,7 @@ const getAllReview = asyncHandler(async (req, res) => {
   const reviews = await ReviewModel.find(req.filterObj)
     .limit(limit)
     .skip(skip)
-    .populate("user_id", ["username", "email"]);
+    .populate("user_id", ["username", "email","profilePicture"]);
   if (reviews.length == 0) {
     res.status(201).json("no reviews");
   }
