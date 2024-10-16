@@ -66,7 +66,7 @@ orderSchema.pre(/^find/, function (next) {
     select: "username profilePicture email phone",
   }).populate({
     path: "cartItems.product",
-    select: "title imageCover ",
+    select: "title imageCover price ",
   });
 
   next();
