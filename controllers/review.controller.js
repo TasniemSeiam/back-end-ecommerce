@@ -21,10 +21,9 @@ createFilterObj = (req, res, next) => {
 };
 
 const getAllReview = asyncHandler(async (req, res) => {
-  const reviews = await ReviewModel.find(req.filterObj).populate("user_id", [
-    "username",
-    "email",
-  ]);
+  const reviews = await ReviewModel.find(req.filterObj)
+    .populate("user_id", ["username", "email", "profilePicture"])
+    .populate("product_id", ["title"]);
   if (reviews.length == 0) {
     res.status(201).json("no reviews");
   }

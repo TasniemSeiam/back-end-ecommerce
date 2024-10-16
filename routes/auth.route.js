@@ -3,7 +3,7 @@ const {
   loginValidator,
 } = require('../util/validators/auth.validator');
 const validationMiddleware  = require('../middleware/validator.middleware');
-
+// const auth = require("../controllers");
 const {
   signup,
   login,
@@ -11,6 +11,7 @@ const {
   signOut,
   sendOtp,
   verifyOTPAndResetPassword,
+  loginAdmin
 } = require('../controllers/Auth.controller');
 const { registerVaildation, emailForResetValidation, verifyOTPAndResetPasswordValidation } = require('../util/validators/user.validator');
 
@@ -18,6 +19,7 @@ const router = express.Router();
 
 router.post('/signup', registerVaildation,validationMiddleware, signup);
 router.post('/login', loginValidator, login);
+router.post('/login-admin', loginValidator, loginAdmin);
 router.post('/auth/google',authWithGoogle);
 router.get('/sign-out',signOut);
 

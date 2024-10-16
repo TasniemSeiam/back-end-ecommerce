@@ -224,7 +224,7 @@ const changeUserPasswordValidator = [
   validatorMiddleware,
 ];
 const getUserValidator = [
-  body("id").isMongoId().withMessage("Invalid User id format"),
+  param("id").isMongoId().withMessage("Invalid User id format"),
   validatorMiddleware,
 ];
 const changeMyPasswordValidator = [

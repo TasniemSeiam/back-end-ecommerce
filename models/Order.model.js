@@ -51,6 +51,11 @@ const orderSchema = new mongoose.Schema(
       default: false,
     },
     deliveredAt: Date,
+    isCanceled: {
+      type: Boolean,
+      default: false,
+    },
+    canceledAt: Date,
   },
   { timestamps: true }
 );
@@ -58,7 +63,7 @@ const orderSchema = new mongoose.Schema(
 orderSchema.pre(/^find/, function (next) {
   this.populate({
     path: "user",
-    select: "name profileImg email phone",
+    select: "username profilePicture email phone",
   }).populate({
     path: "cartItems.product",
     select: "title imageCover ",

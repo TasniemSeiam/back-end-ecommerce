@@ -87,16 +87,12 @@ if (env === "development") {
 
 //limit requests from the same IP
 // const Limiter = rateLimit({
-//   max: 50,
+//   max: 150,
 //   windowMs: 60 * 60 * 1000,
 //   message: "To many requests ,please try again in an hour....",
 // });
 // app.use("/", Limiter);
 
-// app.use((req,res,next)=>{
-//     console.log(req.headers);
-//     next();
-// })
 
 app.use('/api/v1/auth', authRoute);
 app.use('/api/v1/users', userRoute);

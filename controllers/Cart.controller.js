@@ -14,24 +14,20 @@ const calcTotalCartPrice = (cart) => {
   return totalPrice;
 };
 
-
 // end point  POST /api/v1/cart
 // allow to User
 exports.addProductToCart = asyncHandler(async (req, res, next) => {
   const { productId, color } = req.body;
   const product = await Product.findById(productId);
 
-  
   let cart = await Cart.findOne({ user: req.user._id });
 
   if (!cart) {
-    
     cart = await Cart.create({
       user: req.user._id,
       cartItems: [{ product: productId, color, price: product.price }],
     });
   } else {
-    
     const productIndex = cart.cartItems.findIndex(
       (item) => item.product.toString() === productId && item.color === color
     );
@@ -42,11 +38,9 @@ exports.addProductToCart = asyncHandler(async (req, res, next) => {
 
       cart.cartItems[productIndex] = cartItem;
     } else {
-      
       cart.cartItems.push({ product: productId, color, price: product.price });
     }
   }
-
 
   calcTotalCartPrice(cart);
   await cart.save();
@@ -58,7 +52,6 @@ exports.addProductToCart = asyncHandler(async (req, res, next) => {
     data: cart,
   });
 });
-
 
 // end point  GET /api/v1/cart
 // allow to User
@@ -77,7 +70,6 @@ exports.getLoggedUserCart = asyncHandler(async (req, res, next) => {
     data: cart,
   });
 });
-
 
 // end point  DELETE /api/v1/cart/:itemId
 // allow to User
@@ -100,14 +92,12 @@ exports.removeSpecificCartItem = asyncHandler(async (req, res, next) => {
   });
 });
 
-
 // end point  DELETE /api/v1/cart
 // allow to User
 exports.clearCart = asyncHandler(async (req, res, next) => {
   await Cart.findOneAndDelete({ user: req.user._id });
   res.status(204).send();
 });
-
 
 // end point  PUT /api/v1/cart/:itemId
 // allow to User
@@ -143,7 +133,6 @@ exports.updateCartItemQuantity = asyncHandler(async (req, res, next) => {
   });
 });
 
-
 // end point  PUT /api/v1/cart/applyCoupon
 // allow to User
 exports.applyCoupon = asyncHandler(async (req, res, next) => {
@@ -152,21 +141,19 @@ exports.applyCoupon = asyncHandler(async (req, res, next) => {
     name: req.body.coupon,
     expire: { $gt: Date.now() },
   });
-
+  
   if (!coupon) {
     return next(new ApiError(`Coupon is invalid or expired`));
   }
-
 
   const cart = await Cart.findOne({ user: req.user._id });
 
   const totalPrice = cart.totalCartPrice;
 
-
   const totalPriceAfterDiscount = (
     totalPrice -
     (totalPrice * coupon.discount) / 100
-  ).toFixed(2); 
+  ).toFixed(2);
 
   cart.totalPriceAfterDiscount = totalPriceAfterDiscount;
   await cart.save();

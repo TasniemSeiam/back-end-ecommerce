@@ -91,6 +91,15 @@ userSchema.methods.comparePassword = async function (
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
+userSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "wishlist",
+    select: "title imageCover ",
+  });
+
+  next();
+});
+
 // Middleware to remove products, reviews, and orders associated with the user
 userSchema.post("findOneAndDelete", async function (doc) {
   if (doc) {

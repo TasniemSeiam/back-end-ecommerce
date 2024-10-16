@@ -16,7 +16,9 @@ const {
   getLoggedUserData,
   updateLoggedUserPassword,
   updateLoggedUserData,
-  deleteLoggedUserData,
+  activeUserByAdmin,
+  blockUserByAdmin,
+  deleteUserByAdmin
 } = require("../controllers/user.controller");
 const productsRoute = require("./products.route");
 
@@ -31,7 +33,7 @@ router.use(auth.protect);
 router.get("/getMe", getLoggedUserData, getUser);
 router.put("/changeMyPassword", changeMyPasswordValidator,updateLoggedUserPassword);
 router.put("/updateMe", updateUserValidation, updateLoggedUserData);
-router.delete("/deleteMe", deleteLoggedUserData);
+
 
 // // Admin
 router.use(auth.allowedTo("admin", "seller"));
@@ -64,4 +66,7 @@ router.delete(
   deleteUser
 );
 
+router.put("/block/:id",auth.protect, auth.allowedTo("admin"), blockUserByAdmin);
+router.put("/active/:id",auth.protect, auth.allowedTo("admin"), activeUserByAdmin);
+router.delete("/delete-user/:id",auth.protect, auth.allowedTo("admin"), deleteUserByAdmin);
 module.exports = router;

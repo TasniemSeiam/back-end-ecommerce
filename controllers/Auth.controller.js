@@ -132,7 +132,7 @@ exports.signup = asyncHandler(async (req, res) => {
     congratulationsRegister(userData.username)
   );
 });
-
+// login as user or seller
 exports.login = asyncHandler(async (req, res) => {
   const { email } = req.body;
   const validUser = await UserModel.findOne({ email });
@@ -152,6 +152,45 @@ exports.login = asyncHandler(async (req, res) => {
   if (!checkPassword) {
     res.status(401);
     throw new Error("Invalid email or password");
+  }
+
+  const token = generateToken(validUser._id);
+  const { password, ...rest } = validUser._doc;
+  res
+    .cookie("access_token", token, {
+      httpOnly: true,
+      sameSite: "strict",
+      maxAge: 1 * 24 * 60 * 60 * 1000,
+    })
+    .status(201)
+    .json(rest);
+});
+
+// login as admin
+exports.loginAdmin = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  const validUser = await UserModel.findOne({ email });
+  if (!validUser) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  const checkPassword = await validUser.comparePassword(
+    req.body.password,
+    validUser.password
+  );
+  // console.log("==", checkPassword);
+  // console.log("Plain password: ", req.body.password);
+  // console.log("Hashed password from DB: ", validUser.password);
+
+  if (!checkPassword) {
+    res.status(401);
+    throw new Error("Invalid email or password");
+  }
+
+if (validUser.role !== "admin") {
+    res.status(401);
+    throw new Error("not autherized");
   }
 
   const token = generateToken(validUser._id);

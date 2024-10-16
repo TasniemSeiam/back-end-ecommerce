@@ -17,7 +17,6 @@ const categorySchema = new Schema(
     image: {
       type: String,
       // default: "../assets/default-category-cover.jpg",
-      required: [true, "image cover is required"],
     },
     // user: { type: Schema.Types.ObjectId, ref: 'User' },
   },
@@ -34,7 +33,6 @@ categorySchema.post("findOneAndDelete", async function (doc) {
     // Delete all subcategories that belong to the deleted category
 
     await SubCategoryModel.deleteMany({ category: doc._id });
-    console.log(`Deleted all subcategories related to category: ${doc._id}`);
   }
 });
 
